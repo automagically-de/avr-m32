@@ -177,10 +177,14 @@ extern byte_t usb_setup(byte_t data[8])
 			data[1] = result >> 8;
 			return 2;
 		case GENIO_SET_PORT_A_7SEG:
-			PORTA = decto7segr[data[2]];
+			irto7seg = 0;
+			sseg_set_char(data[4], data[2]);
+			sseg_output();
 			return 0;
 		case GENIO_SET_PORT_C_7SEG:
-			PORTC = decto7seg[data[2]];
+			irto7seg = 0;
+			sseg_set_char(data[4], data[2]);
+			sseg_output();
 			return 0;
 		case GENIO_SET_PWM:
 			if(data[4] == 0)
