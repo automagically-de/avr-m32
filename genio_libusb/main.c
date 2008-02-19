@@ -19,7 +19,8 @@ enum {
 	TYPE_BOOL,
 	TYPE_UINT8,
 	TYPE_DEC1,
-	TYPE_FLOAT8
+	TYPE_FLOAT8,
+	TYPE_CHAR
 };
 
 static GenIO_Command commands[] = {
@@ -32,8 +33,8 @@ static GenIO_Command commands[] = {
 	{ GENIO_GET_PORT_A_PIN_D, "get_a_pin",   TYPE_NULL, 1 },
 	{ GENIO_GET_PORT_C_PIN_D, "get_c_pin",   TYPE_NULL, 1 },
 	{ GENIO_GET_PORT_A_PIN_A, "get_a_pin_a", TYPE_NULL, 2 },
-	{ GENIO_SET_PORT_A_7SEG,  "set_a_7seg",  TYPE_DEC1, 0 },
-	{ GENIO_SET_PORT_C_7SEG,  "set_c_7seg",  TYPE_DEC1, 0 },
+	{ GENIO_SET_PORT_A_7SEG,  "set_a_7seg",  TYPE_CHAR, 0 },
+	{ GENIO_SET_PORT_C_7SEG,  "set_c_7seg",  TYPE_CHAR, 0 },
 	{ GENIO_SET_PWM,          "set_pwm",     TYPE_FLOAT8, 0 },
 
 	{ TEST_DEMO,              "demo",        TYPE_NULL, 0 },
@@ -71,6 +72,9 @@ int genio_exec(usb_dev_handle *udh, const char *tcmd,
 			break;
 		case TYPE_FLOAT8:
 			val = (int)(atof(tval) * 255);
+			break;
+		case TYPE_CHAR:
+			val = tval[0];
 			break;
 		default:
 			val = 0;
