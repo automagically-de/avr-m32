@@ -1,7 +1,7 @@
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 CFLAGS = -Wall -mmcu=atmega32 -Os -DF_CPU=12000000UL -g
-OBJS = main.o crc.o usb.o int.o
+OBJS = main.o crc.o usb.o int.o sseg.o
 BINARY = usbtest
 
 SUFFIXES = .S .c .o

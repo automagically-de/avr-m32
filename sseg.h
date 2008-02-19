@@ -1,6 +1,7 @@
 #ifndef _SSEG_H
 #define _SSEG_H
 
-extern char sseg_buffer[9];
+void sseg_set_char(unsigned char n, char c);
+void sseg_output(void);
 
 #endif

@@ -7,6 +7,7 @@
 #include "usbtiny.h"
 #include "usb.h"
 #include "ops.h"
+#include "sseg.h"
 
 static unsigned char decto7seg[10] = {
 	0x02, /* 0: 00000010 */
@@ -224,7 +225,11 @@ ISR(TIMER0_OVF_vect)
 	if(irto7seg) {
 		if((cnt % 10) == 0) {
 			result = get_analog(1);
+			sseg_set_char(0, (((result & 0x0FF) * 10 / 256) & 0x0FF) + 0x30);
+			sseg_output();
+#if 0
 			PORTC = decto7seg[((result & 0x0FF) * 10 / 256) & 0x0FF];
+#endif
 		}
 	}
 	else if(demo) {
