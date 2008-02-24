@@ -21,6 +21,35 @@ void sseg_set_char(unsigned char n, char c)
 	sseg_buffer[n] = out;
 }
 
+#define BIT_SCLR 4
+#define BIT_SCK  3
+#define BIT_RCK  2
+#define BIT_SI   1
+
 void sseg_output(void) {
-	PORTC = ~sseg_buffer[0];
+	unsigned char c, b;
+
+	for(c = 0; c < 8; c ++) {
+		/* set address of 7seg to '238 */
+		PORTC &= ~(0x07 << 5); /* upper 3 bits of port C are address */
+		PORTC |= (c << 5);
+
+		/* clear '595 */
+		PORTC &= ~(1 << BIT_SCLR);
+		PORTC |= (1 << BIT_SCLR);
+
+		/* serialize sseg data */
+		for(b = 0; b < 8; b ++) {
+			if(sseg_buffer[c] & (1 << b))
+				PORTC |= (1 << BIT_SI);
+			else
+				PORTC &= ~(1 << BIT_SI);
+			PORTC |= (1 << BIT_SCK);
+			PORTC &= ~(1 << BIT_SCK);
+		}
+
+		/* data -> storage register */
+		PORTC |= (1 << BIT_RCK);
+		PORTC &= ~(1 << BIT_RCK);
+	}
 }
