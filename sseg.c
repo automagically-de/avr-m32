@@ -30,10 +30,6 @@ void sseg_output(void) {
 	unsigned char c, b;
 
 	for(c = 0; c < 8; c ++) {
-		/* set address of 7seg to '238 */
-		PORTC &= ~(0x07 << 5); /* upper 3 bits of port C are address */
-		PORTC |= (c << 5);
-
 		/* clear '595 */
 		PORTC &= ~(1 << BIT_SCLR);
 		PORTC |= (1 << BIT_SCLR);
@@ -47,6 +43,10 @@ void sseg_output(void) {
 			PORTC |= (1 << BIT_SCK);
 			PORTC &= ~(1 << BIT_SCK);
 		}
+
+		/* set address of 7seg to '238 */
+		PORTC &= ~(0x07 << 5); /* upper 3 bits of port C are address */
+		PORTC |= (c << 5);
 
 		/* data -> storage register */
 		PORTC |= (1 << BIT_RCK);
