@@ -258,8 +258,11 @@ int main() {
 	DDRA = 0x00; /* Port A -> input */
 
 	/* initialize timer */
-	/* TCCR0 = (1 << CS00) | (1 << CS02); */ /* clk / 1024 */
+#if 0
+	TCCR0 = (1 << CS00) | (1 << CS02); /* clk / 1024 */
+#else
 	TCCR0 = (1 << CS00); /* no prescaler */
+#endif
 	TIMSK |= (1 << TOIE0);
 
 	/* initialize PWM */
