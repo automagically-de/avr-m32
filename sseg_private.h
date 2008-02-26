@@ -10,14 +10,14 @@
  */
 
 static unsigned char sseg_map[8] = {
-	4, /* 0x01 dp */
-	2, /* 0x02 A */
-	0, /* 0x04 B x */
-	1, /* 0x08 C x */
-	7, /* 0x10 D x */
-	6, /* 0x20 E x */
-	3, /* 0x40 F */
-	5  /* 0x80 G */ };
+	3, /* 0x01 dp x */
+	5, /* 0x02 A x */
+	7, /* 0x04 B x */
+	6, /* 0x08 C x */
+	0, /* 0x10 D x */
+	1, /* 0x20 E x */
+	4, /* 0x40 F x */
+	2  /* 0x80 G x */ };
 
 /* prototype mapping */
 static unsigned char sseg_mapp[8] = {

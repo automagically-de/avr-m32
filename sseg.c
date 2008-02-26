@@ -16,7 +16,11 @@ void sseg_init(void) {
 	PORTC = (1 << BIT_SCLR) | (1 << 5) | (1 << 6) | (1 << 7);
 
 	for(i = 0; i < 8; i ++)
-		sseg_set_char(i, i);
+		sseg_set_char(i, ' ');
+
+	sseg_set_char(0, 'B');
+	sseg_set_char(1, 'S');
+	sseg_set_char(2, 'U');
 }
 
 void sseg_set_char(unsigned char n, char c)
@@ -30,7 +34,7 @@ void sseg_set_char(unsigned char n, char c)
 	for(bit = 0; bit < 8; bit ++) {
 		mask = (1 << bit);
 		if(code & mask)
-			out |= (1 << bit /*sseg_map[bit]*/);
+			out |= (1 << sseg_map[bit]);
 	}
 	sseg_buffer[n] = out;
 }
