@@ -56,8 +56,10 @@ int genio_exec(usb_dev_handle *udh, const char *tcmd,
 			break;
 		}
 
-	if(command == NULL)
+	if(command == NULL) {
+		fprintf(stderr, "ERROR: unknown command '%s'\n", tcmd);
 		return EXIT_FAILURE;
+	}
 
 	switch(command->type)
 	{
@@ -80,10 +82,11 @@ int genio_exec(usb_dev_handle *udh, const char *tcmd,
 			val = 0;
 			break;
 	}
+#if 0
 	fprintf(stderr,
 		"DEBUG: usb_control_msg: cmd=0x%02X, value=0x%02X, index=0x%02X\n",
 		command->cmdid, val, atoi(tpin));
-
+#endif
 	if(command->rbytes > 0)
 	{
 		bytes = (unsigned char *)calloc(command->rbytes, sizeof(char));

@@ -260,6 +260,8 @@ int main() {
 	/* initialize timer */
 #if 0
 	TCCR0 = (1 << CS00) | (1 << CS02); /* clk / 1024 */
+#elif 1
+	TCCR0 = (1 << CS00) | (1 << CS01); /* clk / 64 */
 #else
 	TCCR0 = (1 << CS00); /* no prescaler */
 #endif
