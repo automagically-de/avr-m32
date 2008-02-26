@@ -46,6 +46,16 @@ void sseg_output(unsigned char n) {
 	/* clear '595 */
 	PORTC &= ~(1 << BIT_SCLR);
 	PORTC |= (1 << BIT_SCLR);
+#elif 0
+	for(b = 0; b < 8; b ++) {
+		PORTC |= (1 << BIT_SI);
+		/* shift */
+		PORTC |= (1 << BIT_SCK);
+		PORTC &= ~(1 << BIT_SCK);
+	}
+	/* data -> storage register */
+	PORTC |= (1 << BIT_RCK);
+	PORTC &= ~(1 << BIT_RCK);
 #endif
 
 	/* serialize sseg data */
