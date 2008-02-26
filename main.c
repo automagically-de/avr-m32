@@ -179,12 +179,12 @@ extern byte_t usb_setup(byte_t data[8])
 		case GENIO_SET_PORT_A_7SEG:
 			irto7seg = 0;
 			sseg_set_char(data[4], data[2]);
-			sseg_output();
+			sseg_output(data[4]);
 			return 0;
 		case GENIO_SET_PORT_C_7SEG:
 			irto7seg = 0;
 			sseg_set_char(data[4], data[2]);
-			sseg_output();
+			sseg_output(data[4]);
 			return 0;
 		case GENIO_SET_PWM:
 			if(data[4] == 0)
@@ -226,22 +226,25 @@ ISR(TIMER0_OVF_vect)
 		PORTC = decto7seg[0];
 #endif
 
+	sseg_output(cnt % 8);
+
+#if 0
 	if(irto7seg) {
 		if((cnt % 10) == 0) {
 			result = get_analog(1);
 			sseg_set_char(0, (((result & 0x0FF) * 10 / 256) & 0x0FF) + 0x30);
-			sseg_output();
+#endif
 #if 0
 			PORTC = decto7seg[((result & 0x0FF) * 10 / 256) & 0x0FF];
-#endif
 		}
 	}
 	else if(demo) {
 		PORTA = moving_line[cnt / 10];
 		PORTC = moving_line_r[cnt / 10];
 	}
+#endif
 	cnt ++;
-	if(cnt >= 60) cnt = 0;
+	if(cnt >= 64) cnt = 0;
 }
 
 int main() {
@@ -252,11 +255,11 @@ int main() {
 	MCUCSR |= (1 << JTD);
 
 	/* default port settings */
-	DDRC = 0xFF; /* Port C -> output */
 	DDRA = 0x00; /* Port A -> input */
 
 	/* initialize timer */
-	TCCR0 = (1 << CS00) | (1 << CS02);
+	/* TCCR0 = (1 << CS00) | (1 << CS02); */ /* clk / 1024 */
+	TCCR0 = (1 << CS00); /* no prescaler */
 	TIMSK |= (1 << TOIE0);
 
 	/* initialize PWM */
@@ -280,6 +283,8 @@ int main() {
 
 	DDRB &= ~((1 << PIN0) | (1 << PIN1)); /* PB0, PB1 -> input */
 	PORTB |= (1 << PIN0) | (1 << PIN1);
+
+	sseg_init();
 
 	for(;;)	{
 		usb_poll();

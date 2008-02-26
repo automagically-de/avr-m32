@@ -3,7 +3,21 @@
 #include "sseg.h"
 #include "sseg_private.h"
 
+#define BIT_SCLR 4
+#define BIT_SCK  3
+#define BIT_RCK  2
+#define BIT_SI   1
+
 char sseg_buffer[9] = "--------";
+
+void sseg_init(void) {
+	unsigned char i;
+	DDRC = 0xFF;
+	PORTC = (1 << BIT_SCLR) | (1 << 5) | (1 << 6) | (1 << 7);
+
+	for(i = 0; i < 8; i ++)
+		sseg_set_char(i, '0' + i);
+}
 
 void sseg_set_char(unsigned char n, char c)
 {
@@ -15,41 +29,35 @@ void sseg_set_char(unsigned char n, char c)
 	out = 0;
 	for(bit = 0; bit < 8; bit ++) {
 		mask = (1 << bit);
-		if(code & mask)
-			out |= (1 << sseg_mapp[bit]);
+		if(!(code & mask))
+			out |= (1 << sseg_map[bit]);
 	}
 	sseg_buffer[n] = out;
 }
 
-#define BIT_SCLR 4
-#define BIT_SCK  3
-#define BIT_RCK  2
-#define BIT_SI   1
+void sseg_output(unsigned char n) {
+	unsigned char b;
 
-void sseg_output(void) {
-	unsigned char c, b;
+	/* clear '595 */
+	PORTC &= ~(1 << BIT_SCLR);
+	PORTC |= (1 << BIT_SCLR);
 
-	for(c = 0; c < 8; c ++) {
-		/* clear '595 */
-		PORTC &= ~(1 << BIT_SCLR);
-		PORTC |= (1 << BIT_SCLR);
-
-		/* serialize sseg data */
-		for(b = 0; b < 8; b ++) {
-			if(sseg_buffer[c] & (1 << b))
-				PORTC |= (1 << BIT_SI);
-			else
-				PORTC &= ~(1 << BIT_SI);
-			PORTC |= (1 << BIT_SCK);
-			PORTC &= ~(1 << BIT_SCK);
-		}
-
-		/* set address of 7seg to '238 */
-		PORTC &= ~(0x07 << 5); /* upper 3 bits of port C are address */
-		PORTC |= (c << 5);
-
-		/* data -> storage register */
-		PORTC |= (1 << BIT_RCK);
-		PORTC &= ~(1 << BIT_RCK);
+	/* serialize sseg data */
+	for(b = 0; b < 8; b ++) {
+		if(sseg_buffer[7 - n] & (1 << b))
+			PORTC |= (1 << BIT_SI);
+		else
+			PORTC &= ~(1 << BIT_SI);
+		PORTC |= (1 << BIT_SCK);
+		PORTC &= ~(1 << BIT_SCK);
 	}
+
+#if 1
+	/* set address of 7seg to '238 */
+	PORTC &= 0x1F; /* upper 3 bits of port C are address */
+	PORTC |= (n << 5);
+#endif
+	/* data -> storage register */
+	PORTC |= (1 << BIT_RCK);
+	PORTC &= ~(1 << BIT_RCK);
 }
