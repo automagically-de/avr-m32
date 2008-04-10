@@ -1,4 +1,4 @@
-#define F_CPU 12000000UL
+#define F_CPU 12000000L
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -8,6 +8,8 @@
 #include "usb.h"
 #include "ops.h"
 #include "sseg.h"
+
+#define BAUD 9600L
 
 static unsigned char decto7seg[10] = {
 	0x02, /* 0: 00000010 */
@@ -42,6 +44,21 @@ static unsigned char moving_line_r[6] = {
 
 static char demo = 0;
 static char irto7seg = 1;
+
+int uart_putc(unsigned char c)
+{
+	while(!(UCSRA & (1 << UDRE)));
+    UDR = c;
+    return 0;
+}
+
+void uart_puts(char *s)
+{
+	while (*s) {
+		uart_putc(*s);
+		s++;
+    }
+}
 
 static uint16_t get_analog(unsigned char port)
 {
@@ -116,6 +133,8 @@ extern byte_t usb_setup(byte_t data[8])
 
 	req = data[1];
 	demo = 0;
+
+	uart_puts("USB command received\n\r");
 
 	switch(req)
 	{
@@ -247,6 +266,7 @@ ISR(TIMER0_OVF_vect)
 	if(cnt >= 64) cnt = 0;
 }
 
+
 int main() {
 	usb_init();
 
@@ -277,6 +297,12 @@ int main() {
 	OCR1A = 1 << 7;
 	OCR1B = 1 << 7;
 
+	/* init UART */
+	UCSRB |= (1 << TXEN);
+	UCSRC |= (1 << URSEL) | (3 << UCSZ0); /* 8N1 */
+	UBRRH = 0;
+	UBRRL = (F_CPU / (BAUD * 16)) - 1;
+
 	/* initialize ADC */
 	ADCSRA = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); /* CLK / 128 */
 	ADMUX = (1 << REFS0); /* AVCC as reference */
@@ -290,6 +316,8 @@ int main() {
 	PORTB |= (1 << PIN0) | (1 << PIN1);
 
 	sseg_init();
+
+	uart_puts("Hello, World!\n\r");
 
 	for(;;)	{
 		usb_poll();
